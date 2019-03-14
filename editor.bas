@@ -224,9 +224,9 @@ fail:   print at position(0, STATUS_Y) color fgbg(0, 0, RED, BLACK), "NO USB    
         end
 
 serial_char: procedure
-            if peek(LTO_usb) = 0 then err = 1 : return
+            if peek(LTO_usb) <> 1 then err = 1 : return
             while peek(LTO_tx)
-                if peek(LTO_usb) = 0 then err = 1 : return
+                if peek(LTO_usb) <> 1 then err = 1 : return
             wend
             poke LTO_tx, ch + 32
         end
