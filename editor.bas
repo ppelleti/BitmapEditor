@@ -9,6 +9,7 @@
         const GRID_Y = 2
         const PREVIEW_X = 9
         const PREVIEW_Y = 11
+        const STATUS_Y = 10
 
         const FG_BG_MODE = 1
         const SCREEN_WIDTH = 20
@@ -25,9 +26,15 @@
         const WHITE = 7
         const BROWN = 11
 
+        const LTO_usb = $0F0F
+        const LTO_tx  = $0F11
+
         def fn fgbg(mem, card, fg, bg) = ((((bg) and $b) + (((bg) and 4) * 4)) * 512 + (fg) + (card) * 8 + (mem) * 2048)
         def fn digit(n) = (16 + (n))
         def fn scrn(x, y) = #backtab((x) + (y) * SCREEN_WIDTH)
+        def fn position(x, y) = ((x) + (y) * SCREEN_WIDTH)
+        def fn send_char(x) = ch = x : gosub serial_char : if err then goto fail
+        def fn send_ctrl(x) = ch = x - 32 : gosub serial_char : if err then goto fail
 
         cls
         mode FG_BG_MODE
@@ -36,6 +43,7 @@
         wait
         cursor_x = 0
         cursor_y = 0
+        err = 0
 
         for i = 0 to 7
             #tmp16 = fgbg(GROM, digit(i + 1), GREEN, BLACK)
@@ -102,6 +110,10 @@ main_loop:
         end if
         old_btn = btn
 
+        if cont.key = 1 then
+            gosub save_bitmap
+        end if
+
         goto main_loop
 
 invert: procedure
@@ -153,6 +165,58 @@ move_down_left: procedure
 move_down_right: procedure
         gosub move_down
         gosub move_right
+        end
+
+save_bitmap: procedure
+        print at position(0, STATUS_Y) color fgbg(0, 0, YELLOW, BLACK), "DUMPING TO SERIAL"
+        err = 0
+        for i = 0 to 1
+            send_char("c")
+            send_char("a")
+            send_char("r")
+            send_char("d")
+            send_char(17 + i)
+            send_char(":")
+            send_ctrl(13)
+            send_ctrl(10)
+            for j = 0 to 7
+                tmp = bmp (j + i * 8)
+                for k = 1 to 4
+                    send_char(" ")
+                next k
+                send_char("B")
+                send_char("I")
+                send_char("T")
+                send_char("M")
+                send_char("A")
+                send_char("P")
+                send_char(" ")
+                send_char("\"")
+                for k = 0 to 7
+                    if (tmp > 127) then
+                        send_char("X")
+                    else
+                        send_char(".")
+                    end if
+                    tmp = tmp * 2
+                next k
+                send_char("\"")
+                send_ctrl(13)
+                send_ctrl(10)
+            next j
+        next i
+        for i = 0 to 19
+            scrn(i, STATUS_Y) = 0
+        next i
+        return
+fail:   print at position(0, STATUS_Y) color fgbg(0, 0, RED, BLACK), "NO USB"
+        end
+
+serial_char: procedure
+            while peek(LTO_tx)
+                if peek(LTO_usb) = 0 then err = 1 : return
+            wend
+            poke LTO_tx, ch + 32
         end
 
 box_card:
