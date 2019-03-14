@@ -100,9 +100,8 @@ main_loop:
 
         wait
 
-        if cont.key = 12 then
-            on (cont and $1f) gosub ,move_down,move_right,move_down,move_up,,move_right,,move_left,move_left,,,move_up,,,,,move_down,move_right,move_down_right,move_up,,move_up_right,,move_left,move_down_left,,,move_up_left
-        end if
+        key = cont.key
+        disc = cont and $1f
 
         if (cont.b0 + cont.b1 + cont.b2) then
             btn = 1
@@ -110,12 +109,16 @@ main_loop:
             btn = 0
         end if
 
+        if key = 12 then
+            on disc gosub ,move_down,move_right,move_down,move_up,,move_right,,move_left,move_left,,,move_up,,,,,move_down,move_right,move_down_right,move_up,,move_up_right,,move_left,move_down_left,,,move_up_left
+        end if
+
         if ((btn = 1) and (old_btn = 0)) then
             gosub invert
         end if
         old_btn = btn
 
-        if cont.key = 1 then
+        if key = 1 then
             gosub save_bitmap
             while cont.key <> 12
                 wait
