@@ -1,9 +1,10 @@
         dim bmp(16)
         dim #bmp16(8)
 
-        const BOX = 0
-        const PREVIEW_1 = 1
-        const PREVIEW_2 = 2
+        const CARD_BOX       = 0
+        const CARD_USB       = 1
+        const CARD_PREVIEW_1 = 62
+        const CARD_PREVIEW_2 = 63
 
         const GRID_X = 2
         const GRID_Y = 2
@@ -39,7 +40,7 @@
         cls
         mode FG_BG_MODE
         wait
-        define BOX, 1, box_card
+        define CARD_BOX, 2, box_card
         wait
         cursor_x = 0
         cursor_y = 0
@@ -59,10 +60,12 @@
             scrn(x, y) = #tmp16
         next i
 
-        scrn(PREVIEW_X, PREVIEW_Y) = fgbg(GRAM, PREVIEW_1, WHITE, BROWN)
-        scrn(PREVIEW_X + 1, PREVIEW_Y) = fgbg(GRAM, PREVIEW_2, WHITE, DARK_GREEN)
+        scrn(PREVIEW_X, PREVIEW_Y) = fgbg(GRAM, CARD_PREVIEW_1, WHITE, BROWN)
+        scrn(PREVIEW_X + 1, PREVIEW_Y) = fgbg(GRAM, CARD_PREVIEW_2, WHITE, DARK_GREEN)
 
 main_loop:
+        gosub show_usb_card
+
         for i = 0 to 1
             for j = 0 to 7
                 tmp = bmp (j + i * 8)
@@ -77,7 +80,7 @@ main_loop:
                         bg = DARK_GREEN
                     end if
                     if (x = cursor_x) and (y = cursor_y) then
-                        #tmp16 = fgbg(GRAM, BOX, RED, bg)
+                        #tmp16 = fgbg(GRAM, CARD_BOX, RED, bg)
                     else
                         #tmp16 = fgbg(GROM, " ", RED, bg)
                     end if
@@ -93,11 +96,13 @@ main_loop:
             #bmp16(i) = bmp(i * 2) + bmp(i * 2 + 1) * 256
         next i
 
-        define PREVIEW_1, 2, #bmp16
+        define CARD_PREVIEW_1, 2, #bmp16
 
         wait
 
-        on (cont and $1f) gosub ,move_down,move_right,move_down,move_up,,move_right,,move_left,move_left,,,move_up,,,,,move_down,move_right,move_down_right,move_up,,move_up_right,,move_left,move_down_left,,,move_up_left
+        if cont.key = 12 then
+            on (cont and $1f) gosub ,move_down,move_right,move_down,move_up,,move_right,,move_left,move_left,,,move_up,,,,,move_down,move_right,move_down_right,move_up,,move_up_right,,move_left,move_down_left,,,move_up_left
+        end if
 
         if (cont.b0 + cont.b1 + cont.b2) then
             btn = 1
@@ -112,6 +117,9 @@ main_loop:
 
         if cont.key = 1 then
             gosub save_bitmap
+            while cont.key <> 12
+                wait
+            wend
         end if
 
         goto main_loop
@@ -209,14 +217,24 @@ save_bitmap: procedure
             scrn(i, STATUS_Y) = 0
         next i
         return
-fail:   print at position(0, STATUS_Y) color fgbg(0, 0, RED, BLACK), "NO USB"
+fail:   print at position(0, STATUS_Y) color fgbg(0, 0, RED, BLACK), "NO USB           "
         end
 
 serial_char: procedure
+            if peek(LTO_usb) = 0 then err = 1 : return
             while peek(LTO_tx)
                 if peek(LTO_usb) = 0 then err = 1 : return
             wend
             poke LTO_tx, ch + 32
+        end
+
+show_usb_card: procedure
+            if (peek(LTO_usb) = 1) then
+                #tmp16 = fgbg(GRAM, CARD_USB, WHITE, BLACK)
+            else
+                #tmp16 = fgbg(GROM, " ", WHITE, BLACK)
+            end if
+            scrn(19, 0) = #tmp16
         end
 
 box_card:
@@ -228,3 +246,12 @@ box_card:
         bitmap "*......*"
         bitmap "*......*"
         bitmap "********"
+usb_card:
+        bitmap "...*...."
+        bitmap "...*.*.."
+        bitmap ".*.*.*.."
+        bitmap ".*.*.*.."
+        bitmap ".*.**..."
+        bitmap "..**...."
+        bitmap "...*...."
+        bitmap "...*...."
