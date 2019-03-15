@@ -1,7 +1,7 @@
         include "emu_link.mac"
         include "el_fileio.mac"
 
-inty_emu_detect: proc
+INTY_EMU_DETECT: proc
         begin
         EL_EMU_DETECT
         bnc @@done
@@ -10,7 +10,7 @@ inty_emu_detect: proc
         return
         endp
 
-inty_open: proc
+INTY_OPEN: proc
         begin
         movr r0, r2             ; pointer to ASCIIZ filename
         movr r1, r3             ; flags
@@ -23,7 +23,7 @@ inty_open: proc
         return
         endp
 
-inty_close: proc
+INTY_CLOSE: proc
         begin
         movr r0, r2             ; file descriptor
         ELFI_CLOSE
@@ -35,7 +35,7 @@ inty_close: proc
         return
         endp
 
-inty_write: proc
+INTY_WRITE: proc
         begin
         movr r2, r4             ; number of bytes to write
         movr r1, r3             ; pointer to buffer

@@ -63,6 +63,8 @@
         scrn(PREVIEW_X, PREVIEW_Y) = fgbg(GRAM, CARD_PREVIEW_1, WHITE, BROWN)
         scrn(PREVIEW_X + 1, PREVIEW_Y) = fgbg(GRAM, CARD_PREVIEW_2, WHITE, DARK_GREEN)
 
+        #emu = usr inty_emu_detect
+
 main_loop:
         gosub show_usb_card
 
@@ -240,12 +242,19 @@ serial_char: procedure
         end
 
 show_usb_card: procedure
+        if #emu = -1 then
             if (peek(LTO_usb) = 1) then
                 #tmp16 = fgbg(GRAM, CARD_USB, WHITE, BLACK)
             else
                 #tmp16 = fgbg(GROM, " ", WHITE, BLACK)
             end if
             scrn(19, 0) = #tmp16
+        else
+            tmp = ((#emu / 256) and $ff) - 32
+            scrn(18, 0) = fgbg(GROM, tmp, WHITE, BLACK)
+            tmp = (#emu and $ff) - 32
+            scrn(19, 0) = fgbg(GROM, tmp, WHITE, BLACK)
+        end if
         end
 
 box_card:
