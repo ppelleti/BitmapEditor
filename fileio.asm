@@ -19,6 +19,7 @@ INTY_OPEN: proc
         movr r2, r0             ; return file descriptor on success
         return
 @@fail:
+        mvo r0, var_&ERRNO
         mvii #$ffff, r0         ; return -1 on error
         return
         endp
@@ -31,6 +32,7 @@ INTY_CLOSE: proc
         mvii #0, r0             ; return 0 on success
         return
 @@fail:
+        mvo r0, var_&ERRNO
         mvii #$ffff, r0         ; return -1 on error
         return
         endp
@@ -45,6 +47,7 @@ INTY_WRITE: proc
         movr r1, r0             ; return number of bytes written on success
         return
 @@fail:
+        mvo r0, var_&ERRNO
         mvii #$ffff, r0         ; return -1 on error
         return
         endp

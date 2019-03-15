@@ -38,7 +38,8 @@
         const O_EXCL   = 16
         const O_TRUNC  = 32
 
-        def fn fgbg(mem, card, fg, bg) = ((((bg) and $b) + (((bg) and 4) * 4)) * 512 + (fg) + (card) * 8 + (mem) * 2048)
+        def fn fgbg(fg, bg) = ((((bg) and $b) + (((bg) and 4) * 4)) * 512 + (fg))
+        def fn fgbgc(mem, card, fg, bg) = ((((bg) and $b) + (((bg) and 4) * 4)) * 512 + (fg) + (card) * 8 + (mem) * 2048)
         def fn digit(n) = (16 + (n))
         def fn scrn(x, y) = #backtab((x) + (y) * SCREEN_WIDTH)
         def fn position(x, y) = ((x) + (y) * SCREEN_WIDTH)
@@ -55,21 +56,21 @@
         err = 0
 
         for i = 0 to 7
-            #tmp16 = fgbg(GROM, digit(i + 1), GREEN, BLACK)
+            #tmp16 = fgbgc(GROM, digit(i + 1), GREEN, BLACK)
             x = i + GRID_X
             y = GRID_Y - 1
             scrn(x, y) = #tmp16
-            #tmp16 = fgbg(GROM, digit(i + 1), TAN, BLACK)
+            #tmp16 = fgbgc(GROM, digit(i + 1), TAN, BLACK)
             x = i + 8 + GRID_X
             scrn(x, y) = #tmp16
-            #tmp16 = fgbg(GROM, digit(i + 1), BLUE, BLACK)
+            #tmp16 = fgbgc(GROM, digit(i + 1), BLUE, BLACK)
             x = GRID_X - 1
             y = i + GRID_Y
             scrn(x, y) = #tmp16
         next i
 
-        scrn(PREVIEW_X, PREVIEW_Y) = fgbg(GRAM, CARD_PREVIEW_1, WHITE, BROWN)
-        scrn(PREVIEW_X + 1, PREVIEW_Y) = fgbg(GRAM, CARD_PREVIEW_2, WHITE, DARK_GREEN)
+        scrn(PREVIEW_X, PREVIEW_Y) = fgbgc(GRAM, CARD_PREVIEW_1, WHITE, BROWN)
+        scrn(PREVIEW_X + 1, PREVIEW_Y) = fgbgc(GRAM, CARD_PREVIEW_2, WHITE, DARK_GREEN)
 
         #emu = usr inty_emu_detect
 
@@ -90,9 +91,9 @@ main_loop:
                         bg = DARK_GREEN
                     end if
                     if (x = cursor_x) and (y = cursor_y) then
-                        #tmp16 = fgbg(GRAM, CARD_BOX, RED, bg)
+                        #tmp16 = fgbgc(GRAM, CARD_BOX, RED, bg)
                     else
-                        #tmp16 = fgbg(GROM, " ", RED, bg)
+                        #tmp16 = fgbgc(GROM, " ", RED, bg)
                     end if
                     x = x + GRID_X
                     y = y + GRID_Y
@@ -195,7 +196,7 @@ move_down_right: procedure
         end
 
 save_bitmap: procedure
-        print at position(0, STATUS_Y) color fgbg(0, 0, YELLOW, BLACK), "DUMPING TO SERIAL"
+        print at position(0, STATUS_Y) color fgbg(YELLOW, BLACK), "DUMPING TO SERIAL"
         err = 0
 
         if #emu <> -1 then
@@ -251,7 +252,14 @@ save_bitmap: procedure
         next i
         return
 
-fail:   print at position(0, STATUS_Y) color fgbg(0, 0, RED, BLACK), "NO USB           "
+fail:   for i = 0 to 19
+            scrn(i, STATUS_Y) = 0
+        next i
+        if (#emu = -1) then
+            print at position(0, STATUS_Y) color fgbg(RED, BLACK), "NO USB"
+        else
+            print at position(0, STATUS_Y) color fgbg(RED, BLACK), "ERRNO = ", <>#errno
+        end if
         end
 
 dispatch_char: procedure
@@ -288,16 +296,16 @@ close_file: procedure
 show_usb_card: procedure
         if #emu = -1 then
             if (peek(LTO_usb) = 1) then
-                #tmp16 = fgbg(GRAM, CARD_USB, WHITE, BLACK)
+                #tmp16 = fgbgc(GRAM, CARD_USB, WHITE, BLACK)
             else
-                #tmp16 = fgbg(GROM, " ", WHITE, BLACK)
+                #tmp16 = fgbgc(GROM, " ", WHITE, BLACK)
             end if
             scrn(19, 0) = #tmp16
         else
             tmp = ((#emu / 256) and $ff) - 32
-            scrn(18, 0) = fgbg(GROM, tmp, WHITE, BLACK)
+            scrn(18, 0) = fgbgc(GROM, tmp, WHITE, BLACK)
             tmp = (#emu and $ff) - 32
-            scrn(19, 0) = fgbg(GROM, tmp, WHITE, BLACK)
+            scrn(19, 0) = fgbgc(GROM, tmp, WHITE, BLACK)
         end if
         end
 
