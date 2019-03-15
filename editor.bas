@@ -196,10 +196,12 @@ move_down_right: procedure
         end
 
 save_bitmap: procedure
-        print at position(0, STATUS_Y) color fgbg(YELLOW, BLACK), "DUMPING TO SERIAL"
         err = 0
 
-        if #emu <> -1 then
+        if #emu = -1 then
+            print at position(0, STATUS_Y) color fgbg(YELLOW, BLACK), "DUMPING TO SERIAL   "
+        else
+            print at position(0, STATUS_Y) color fgbg(YELLOW, BLACK), "WRITING TO FILE     "
             gosub open_file
             if err then goto fail
         end if
@@ -250,6 +252,13 @@ save_bitmap: procedure
         for i = 0 to 19
             scrn(i, STATUS_Y) = 0
         next i
+
+        if #emu = -1 then
+            print at position(0, STATUS_Y) color fgbg(GREEN, BLACK), "DUMPED TO SERIAL"
+        else
+            print at position(0, STATUS_Y) color fgbg(GREEN, BLACK), "WROTE TO FILE"
+        end if
+
         return
 
 fail:   for i = 0 to 19
@@ -279,7 +288,7 @@ serial_char: procedure
         end
 
 open_file: procedure
-            #fd = usr inty_open(varptr filename, O_WRONLY + O_APPEND + O_CREAT)
+            #fd = usr inty_open(varptr filename(0), O_WRONLY + O_APPEND + O_CREAT)
             if (#fd = -1) then err = 1
         end
 
