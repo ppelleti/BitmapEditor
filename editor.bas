@@ -30,12 +30,20 @@
         const LTO_usb = $0F0F
         const LTO_tx  = $0F11
 
+        const O_RDONLY = 1
+        const O_WRONLY = 2
+        const O_RDWR   = 3
+        const O_APPEND = 4
+        const O_CREAT  = 8
+        const O_EXCL   = 16
+        const O_TRUNC  = 32
+
         def fn fgbg(mem, card, fg, bg) = ((((bg) and $b) + (((bg) and 4) * 4)) * 512 + (fg) + (card) * 8 + (mem) * 2048)
         def fn digit(n) = (16 + (n))
         def fn scrn(x, y) = #backtab((x) + (y) * SCREEN_WIDTH)
         def fn position(x, y) = ((x) + (y) * SCREEN_WIDTH)
-        def fn send_char(x) = ch = x : gosub serial_char : if err then goto fail
-        def fn send_ctrl(x) = ch = x - 32 : gosub serial_char : if err then goto fail
+        def fn send_char(x) = ch = x + 32: gosub dispatch_char : if err then goto fail
+        def fn send_ctrl(x) = ch = x : gosub dispatch_char : if err then goto fail
 
         cls
         mode FG_BG_MODE
@@ -189,6 +197,12 @@ move_down_right: procedure
 save_bitmap: procedure
         print at position(0, STATUS_Y) color fgbg(0, 0, YELLOW, BLACK), "DUMPING TO SERIAL"
         err = 0
+
+        if #emu <> -1 then
+            gosub open_file
+            if err then goto fail
+        end if
+
         send_ctrl(13)
         send_ctrl(10)
         for i = 0 to 1
@@ -226,11 +240,26 @@ save_bitmap: procedure
                 send_ctrl(10)
             next j
         next i
+
+        if #emu <> -1 then
+            gosub close_file
+            if err then goto fail
+        end if
+
         for i = 0 to 19
             scrn(i, STATUS_Y) = 0
         next i
         return
+
 fail:   print at position(0, STATUS_Y) color fgbg(0, 0, RED, BLACK), "NO USB           "
+        end
+
+dispatch_char: procedure
+            if #emu = -1 then
+                gosub serial_char
+            else
+                gosub write_char
+            end if
         end
 
 serial_char: procedure
@@ -238,7 +267,22 @@ serial_char: procedure
             while peek(LTO_tx)
                 if peek(LTO_usb) <> 1 then err = 1 : return
             wend
-            poke LTO_tx, ch + 32
+            poke LTO_tx, ch
+        end
+
+open_file: procedure
+            #fd = usr inty_open(varptr filename, O_WRONLY + O_APPEND + O_CREAT)
+            if (#fd = -1) then err = 1
+        end
+
+write_char: procedure
+            #ret = usr inty_write(#fd, varptr ch, 1)
+            if (#ret = -1) then err = 1
+        end
+
+close_file: procedure
+            #ret = usr inty_close(#fd)
+            if (#ret = -1) then err = 1
         end
 
 show_usb_card: procedure
@@ -275,5 +319,9 @@ box_card:
         bitmap "..**...."
         bitmap "...*...."
         bitmap "...*...."
+
+filename:
+        data "bitmap.bas"
+        data 0
 
         asm include "fileio.asm"

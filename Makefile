@@ -11,4 +11,4 @@ editor.rom: editor.asm fileio.asm emu_link.mac el_fileio.mac
 	$(AS1600) -o editor.rom editor.asm
 
 run: editor.rom
-	$(JZINTV) -z3 editor.rom
+	$(JZINTV) -z3 --file-io . editor.rom
