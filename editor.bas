@@ -329,7 +329,16 @@ box_card:
         bitmap "...*...."
 
 filename:
-        data "bitmap.bas"
+        data $62 'b
+        data $69 'i
+        data $74 't
+        data $6d 'm
+        data $61 'a
+        data $70 'p
+        data $2e '.
+        data $62 'b
+        data $61 'a
+        data $73 's
         data 0
 
         asm include "fileio.asm"
