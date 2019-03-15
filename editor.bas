@@ -187,6 +187,8 @@ move_down_right: procedure
 save_bitmap: procedure
         print at position(0, STATUS_Y) color fgbg(0, 0, YELLOW, BLACK), "DUMPING TO SERIAL"
         err = 0
+        send_ctrl(13)
+        send_ctrl(10)
         for i = 0 to 1
             send_char("c")
             send_char("a")
