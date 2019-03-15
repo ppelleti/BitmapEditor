@@ -257,7 +257,7 @@ box_card:
         bitmap "*......*"
         bitmap "*......*"
         bitmap "********"
-usb_card:
+' usb_card
         bitmap "...*...."
         bitmap "...*.*.."
         bitmap ".*.*.*.."
@@ -266,3 +266,5 @@ usb_card:
         bitmap "..**...."
         bitmap "...*...."
         bitmap "...*...."
+
+        asm include "fileio.asm"

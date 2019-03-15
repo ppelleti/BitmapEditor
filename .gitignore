@@ -3,3 +3,4 @@
 *.cfg
 *.rom
 *~
+!fileio.asm
