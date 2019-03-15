@@ -38,6 +38,13 @@
         const O_EXCL   = 16
         const O_TRUNC  = 32
 
+        const DISC_MASK = $1f
+        const KEYPAD_MASK = $e0
+        def fn is_keypad(x) = (((x) = $80) + ((x) = $40) + ((x) = $20))
+        const KEYPAD_1     = $81
+        const KEYPAD_CLEAR = $88
+        const KEYPAD_0     = $48
+
         def fn fgbg(fg, bg) = ((((bg) and $b) + (((bg) and 4) * 4)) * 512 + (fg))
         def fn fgbgc(mem, card, fg, bg) = ((((bg) and $b) + (((bg) and 4) * 4)) * 512 + (fg) + (card) * 8 + (mem) * 2048)
         def fn digit(n) = (16 + (n))
@@ -112,9 +119,9 @@ main_loop:
         wait
 
         cnt = cont
-        disc = cnt and $1f
-        upper = cnt and $e0
-        if (upper = $80) + (upper = $40) + (upper = $20) then
+        disc = cnt and DISC_MASK
+        upper = cnt and KEYPAD_MASK
+        if (is_keypad(upper)) then
             key_pressed = 1
         else
             key_pressed = 0
@@ -135,14 +142,26 @@ main_loop:
         end if
         old_btn = btn
 
-        if cnt = $81 then
+        if cnt = KEYPAD_1 then
             gosub save_bitmap
-            while cont = $81
+            while cont = KEYPAD_1
+                wait
+            wend
+        elseif cnt = KEYPAD_CLEAR then
+            gosub do_clear
+            while cont = KEYPAD_CLEAR
                 wait
             wend
         end if
 
         goto main_loop
+
+do_clear: procedure
+            for i = 0 to 15
+                bmp(i) = 0
+            next i
+            print at position(0, STATUS_Y) color fgbg(WHITE, BLACK), "CLEARED!"
+        end
 
 invert: procedure
             idx = cursor_y
