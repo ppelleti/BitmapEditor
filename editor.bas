@@ -100,8 +100,15 @@ main_loop:
 
         wait
 
-        key = cont.key
-        disc = cont and $1f
+        cnt = cont
+        ' key = cont.key
+        disc = cnt and $1f
+        upper = cnt and $e0
+        if (upper = $80) + (upper = $40) + (upper = $20) then
+            key_pressed = 1
+        else
+            key_pressed = 0
+        end if
 
         if (cont.b0 + cont.b1 + cont.b2) then
             btn = 1
@@ -109,7 +116,15 @@ main_loop:
             btn = 0
         end if
 
-        if key = 12 then
+        ' print at 0 color 6, "CONT = ", <.3>cnt
+        ' print at 0 color 6, "KEY = ", <.2>key, " DISC = "
+        ' if key = 12 then
+        '     print <.2>disc
+        ' else
+        '     print "--"
+        ' end if
+
+        if key_pressed = 0 then
             on disc gosub ,move_down,move_right,move_down,move_up,,move_right,,move_left,move_left,,,move_up,,,,,move_down,move_right,move_down_right,move_up,,move_up_right,,move_left,move_down_left,,,move_up_left
         end if
 
@@ -118,9 +133,9 @@ main_loop:
         end if
         old_btn = btn
 
-        if key = 1 then
+        if cnt = $81 then
             gosub save_bitmap
-            while cont.key <> 12
+            while cont = $81
                 wait
             wend
         end if
