@@ -1,8 +1,9 @@
         dim bmp(16)
         dim #bmp16(8)
 
-        const CARD_BOX       = 0
-        const CARD_USB       = 1
+        const CARD_COPYR     = 0
+        const CARD_BOX       = 1
+        const CARD_USB       = 2
         const CARD_PREVIEW_1 = 62
         const CARD_PREVIEW_2 = 63
 
@@ -57,7 +58,7 @@
         def fn send_ctrl(x) = ch = x : gosub dispatch_char : if err then goto fail
 
         cls
-        define CARD_BOX, 2, box_card
+        define CARD_COPYR, 3, copyr_card
         wait
         cursor_x = 0
         cursor_y = 0
@@ -86,6 +87,8 @@ redraw_screen:
 
         scrn(PREVIEW_X, PREVIEW_Y) = fgbgc(GRAM, CARD_PREVIEW_1, WHITE, BROWN)
         scrn(PREVIEW_X + 1, PREVIEW_Y) = fgbgc(GRAM, CARD_PREVIEW_2, WHITE, DARK_GREEN)
+
+        print at position(0, STATUS_Y) color fgbg(WHITE, BLACK), "PRESS 0 FOR HELP"
 
 main_loop:
         gosub show_usb_card
@@ -175,7 +178,7 @@ show_help: procedure
         wait
         print at position(3, 0) color GREEN, "Bitmap Editor"
         print at position(0, 1), "by Patrick Pelletier"
-        print at position(3, 2), "c 2019, GPLv3+"
+        print at position(3, 2), "\256 2019, GPLv3+"
         print at position(0, 3) color WHITE, "Use disc to move."
         print at position(0, 4), "Press any side btn"
         print at position(0, 5), "to invert pixel."
@@ -295,7 +298,7 @@ save_bitmap: procedure
                 send_char("\"")
                 for k = 0 to 7
                     if (tmp > 127) then
-                        send_char("X")
+                        send_char("*")
                     else
                         send_char(".")
                     end if
@@ -381,7 +384,16 @@ show_usb_card: procedure
         end if
         end
 
-box_card:
+copyr_card:
+        bitmap "..****.."
+        bitmap ".*....*."
+        bitmap "*..***.*"
+        bitmap "*.*....*"
+        bitmap "*.*....*"
+        bitmap "*..***.*"
+        bitmap ".*....*."
+        bitmap "..****.."
+' box_card
         bitmap "********"
         bitmap "*......*"
         bitmap "*......*"
