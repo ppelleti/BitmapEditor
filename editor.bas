@@ -12,8 +12,11 @@
         const PREVIEW_Y = 11
         const STATUS_Y = 10
 
-        const FG_BG_MODE = 1
+        const COLOR_STACK_MODE = 0
+        const FG_BG_MODE       = 1
+
         const SCREEN_WIDTH = 20
+
         const GROM = 0
         const GRAM = 1
 
@@ -54,14 +57,19 @@
         def fn send_ctrl(x) = ch = x : gosub dispatch_char : if err then goto fail
 
         cls
-        mode FG_BG_MODE
-        wait
         define CARD_BOX, 2, box_card
         wait
         cursor_x = 0
         cursor_y = 0
         err = 0
 
+        #emu = usr inty_emu_detect
+
+redraw_screen:
+        mode FG_BG_MODE
+        cls
+        border BLACK
+        wait
         for i = 0 to 7
             #tmp16 = fgbgc(GROM, digit(i + 1), GREEN, BLACK)
             x = i + GRID_X
@@ -78,8 +86,6 @@
 
         scrn(PREVIEW_X, PREVIEW_Y) = fgbgc(GRAM, CARD_PREVIEW_1, WHITE, BROWN)
         scrn(PREVIEW_X + 1, PREVIEW_Y) = fgbgc(GRAM, CARD_PREVIEW_2, WHITE, DARK_GREEN)
-
-        #emu = usr inty_emu_detect
 
 main_loop:
         gosub show_usb_card
@@ -152,9 +158,47 @@ main_loop:
             while cont = KEYPAD_CLEAR
                 wait
             wend
+        elseif cnt = KEYPAD_0 then
+            gosub show_help
+            while cont <> 0
+                wait
+            wend
+            goto redraw_screen
         end if
 
         goto main_loop
+
+show_help: procedure
+        mode COLOR_STACK_MODE, BLUE, BLUE, BLUE, BLUE
+        cls
+        border BLUE
+        wait
+        print at position(3, 0) color GREEN, "Bitmap Editor"
+        print at position(0, 1), "by Patrick Pelletier"
+        print at position(3, 2), "c 2019, GPLv3+"
+        print at position(0, 3) color WHITE, "Use disc to move."
+        print at position(0, 4), "Press any side btn"
+        print at position(0, 5), "to invert pixel."
+        print at position(0, 6), "Press CLEAR to"
+        print at position(0, 7), "clear.  Press 1 to"
+        if emu = -1 then
+            print at position(0, 8), "dump to USB serial."
+        else
+            print at position(0, 8), "append to file"
+            print at position(0, 9), "'bitmap.bas'."
+        end if
+        print at position(0, 10), "(Press anything to"
+        print at position(0, 11), "exit this screen.)"
+
+        while cont = KEYPAD_0
+            wait
+        wend
+
+        while cont = 0
+            wait
+        wend
+
+        end
 
 do_clear: procedure
             for i = 0 to 15
