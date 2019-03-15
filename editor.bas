@@ -101,7 +101,6 @@ main_loop:
         wait
 
         cnt = cont
-        ' key = cont.key
         disc = cnt and $1f
         upper = cnt and $e0
         if (upper = $80) + (upper = $40) + (upper = $20) then
@@ -115,14 +114,6 @@ main_loop:
         else
             btn = 0
         end if
-
-        ' print at 0 color 6, "CONT = ", <.3>cnt
-        ' print at 0 color 6, "KEY = ", <.2>key, " DISC = "
-        ' if key = 12 then
-        '     print <.2>disc
-        ' else
-        '     print "--"
-        ' end if
 
         if key_pressed = 0 then
             on disc gosub ,move_down,move_right,move_down,move_up,,move_right,,move_left,move_left,,,move_up,,,,,move_down,move_right,move_down_right,move_up,,move_up_right,,move_left,move_down_left,,,move_up_left
