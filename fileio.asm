@@ -1,6 +1,23 @@
+        ; fileio.asm - wrappers to allow IntyBASIC to call EmuLink
+        ; Copyright (C) 2019 Patrick Pelletier <code@funwithsoftware.org>
+        ;
+        ; This program is free software: you can redistribute it and/or modify
+        ; it under the terms of the GNU General Public License as published by
+        ; the Free Software Foundation, either version 3 of the License, or
+        ; (at your option) any later version.
+        ;
+        ; This program is distributed in the hope that it will be useful,
+        ; but WITHOUT ANY WARRANTY; without even the implied warranty of
+        ; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        ; GNU General Public License for more details.
+        ;
+        ; You should have received a copy of the GNU General Public License
+        ; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
         include "emu_link.mac"
         include "el_fileio.mac"
 
+        ;; #emu = usr inty_emu_detect
 INTY_EMU_DETECT: proc
         begin
         EL_EMU_DETECT
@@ -10,6 +27,7 @@ INTY_EMU_DETECT: proc
         return
         endp
 
+        ;; #fd = usr inty_open(varptr filename(0), flags)
 INTY_OPEN: proc
         begin
         movr r0, r2             ; pointer to ASCIIZ filename
@@ -24,6 +42,7 @@ INTY_OPEN: proc
         return
         endp
 
+        ;; #ret = usr inty_close(#fd)
 INTY_CLOSE: proc
         begin
         movr r0, r2             ; file descriptor
@@ -37,6 +56,7 @@ INTY_CLOSE: proc
         return
         endp
 
+        ;; #ret = usr inty_write(#fd, varptr buf(0), len)
 INTY_WRITE: proc
         begin
         movr r2, r4             ; number of bytes to write
