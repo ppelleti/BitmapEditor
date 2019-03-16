@@ -4,3 +4,4 @@
 *.rom
 *~
 !fileio.asm
+show-serial
