@@ -247,6 +247,7 @@ do_clear: procedure
             for i = 0 to 15
                 bmp(i) = 0
             next i
+            gosub clear_status
             print at position(0, STATUS_Y) color fgbg(WHITE, BLACK), "CLEARED!"
         end
 
@@ -355,9 +356,7 @@ save_bitmap: procedure
             if err then goto fail
         end if
 
-        for i = 0 to 19
-            scrn(i, STATUS_Y) = 0
-        next i
+        gosub clear_status
 
         if #emu = -1 then
             print at position(0, STATUS_Y) color fgbg(GREEN, BLACK), "DUMPED TO SERIAL"
@@ -367,14 +366,18 @@ save_bitmap: procedure
 
         return
 
-fail:   for i = 0 to 19
-            scrn(i, STATUS_Y) = 0
-        next i
+fail:   gosub clear_status
         if (#emu = -1) then
             print at position(0, STATUS_Y) color fgbg(RED, BLACK), "NO USB"
         else
             print at position(0, STATUS_Y) color fgbg(RED, BLACK), "ERRNO = ", <>#errno
         end if
+        end
+
+clear_status: procedure
+        for i = 0 to 19
+            scrn(i, STATUS_Y) = 0
+        next i
         end
 
 dispatch_char: procedure
@@ -472,5 +475,6 @@ filename:
         asm cfgvar "author" = "Patrick Pelletier"
         asm cfgvar "more_info_at" = "https://github.com/ppelleti/BitmapEditor"
         asm cfgvar "license" = "GPLv3+"
+        asm cfgvar "release_date" = "2019-03-16"
         asm cfgvar "version" = "1.0"
         asm cfgvar "description" = "A bitmap editor for two 8x8 cards, which can be saved over an LTO Flash! serial connection."
