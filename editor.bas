@@ -82,6 +82,11 @@
 
         #emu = usr inty_emu_detect
 
+        gosub show_title
+        while cont <> 0
+            wait
+        wend
+
 redraw_screen:
         mode FG_BG_MODE
         cls
@@ -187,26 +192,45 @@ main_loop:
 
         goto main_loop
 
+show_title: procedure
+        mode COLOR_STACK_MODE, BLUE, BLUE, BLUE, BLUE
+        cls
+        border BLUE
+        wait
+
+        print at position(1, 0) color WHITE, "Patrick Pelletier"
+        print at position(6, 1), "presents"
+        print at position(1, 2), "Bitmap Editor 1.0"
+        print at position(0, 4), "\256 2019 P. Pelletier"
+        print at position(7, 5), "GPLv3+"
+        print at position(0, 7) color GREEN, "code@"
+        print at position(0, 8), "funwithsoftware.org"
+        print at position(0, 10) color YELLOW, "https://github.com/ppelleti/BitmapEditor"
+
+        while cont = 0
+            wait
+        wend
+
+        end
+
 show_help: procedure
         mode COLOR_STACK_MODE, BLUE, BLUE, BLUE, BLUE
         cls
         border BLUE
         wait
-        print at position(1, 0) color GREEN, "Bitmap Editor 1.0"
-        print at position(0, 1), "by Patrick Pelletier"
-        print at position(3, 2), "\256 2019, GPLv3+"
-        print at position(0, 3) color WHITE, "Use disc to move."
-        print at position(0, 4), "Press any side btn"
-        print at position(0, 5), "to invert pixel."
-        print at position(0, 6), "Press CLEAR to"
-        print at position(0, 7), "clear.  Press 1 to"
+        print at position(3, 0) color GREEN, "Bitmap Editor"
+        print at position(0, 2) color WHITE, "Use disc to move."
+        print at position(0, 3), "Press any side btn"
+        print at position(0, 4), "to invert pixel."
+        print at position(0, 5), "Press CLEAR to"
+        print at position(0, 6), "clear.  Press 1 to"
         if #emu = -1 then
-            print at position(0, 8), "dump to USB serial."
+            print at position(0, 7), "dump to USB serial."
         else
-            print at position(0, 8), "append to file"
-            print at position(0, 9), "'bitmap.bas'."
+            print at position(0, 7), "append to file"
+            print at position(0, 8), "\"bitmap.bas\"."
         end if
-        print at position(0, 10), "(Press anything to"
+        print at position(0, 10) color GREEN, "(Press anything to"
         print at position(0, 11), "exit this screen.)"
 
         while cont = KEYPAD_0
