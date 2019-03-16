@@ -176,7 +176,7 @@ show_help: procedure
         cls
         border BLUE
         wait
-        print at position(3, 0) color GREEN, "Bitmap Editor"
+        print at position(1, 0) color GREEN, "Bitmap Editor 1.0"
         print at position(0, 1), "by Patrick Pelletier"
         print at position(3, 2), "\256 2019, GPLv3+"
         print at position(0, 3) color WHITE, "Use disc to move."
@@ -184,7 +184,7 @@ show_help: procedure
         print at position(0, 5), "to invert pixel."
         print at position(0, 6), "Press CLEAR to"
         print at position(0, 7), "clear.  Press 1 to"
-        if emu = -1 then
+        if #emu = -1 then
             print at position(0, 8), "dump to USB serial."
         else
             print at position(0, 8), "append to file"
@@ -426,3 +426,11 @@ filename:
         data 0
 
         asm include "fileio.asm"
+
+        asm cfgvar "name" = "Bitmap Editor"
+        asm cfgvar "short_name" = "Bitmap Editor"
+        asm cfgvar "author" = "Patrick Pelletier"
+        asm cfgvar "more_info_at" = "https://github.com/ppelleti/BitmapEditor"
+        asm cfgvar "license" = "GPLv3+"
+        asm cfgvar "version" = "1.0"
+        asm cfgvar "description" = "A bitmap editor for two 8x8 cards, which can be saved over an LTO Flash! serial connection."
