@@ -46,7 +46,7 @@ when the LTO Flash! is connected to a host computer.
 ## Saving bitmaps with jzIntv
 
 On the jzIntv emulator, pressing 1 will append the current bitmap to
-the file `bitmap.bas`.  This only works if your specify the `--file-io`
+the file `bitmap.bas`.  This only works if you specify the `--file-io`
 argument when running jzIntv.  For example,
 
 ```

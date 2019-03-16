@@ -115,7 +115,7 @@ will append the
 current bitmap to
 the file
 "bitmap.bas".  This
-only works if your
+only works if you
 specify the
 "--file-io" argument
 when running jzIntv.
