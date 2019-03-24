@@ -59,6 +59,25 @@ The bitmap editor will display two letters (an abbreviation of the
 emulator name) in the upper right corner when running on a supported
 emulator.  (Currently only jzIntv supports saving to a file.)
 
+## Building
+
+A Makefile is provided.  Do `make` to build both `editor.rom` and
+`show-serial`, or do `make editor.rom` to just build the ROM.
+
+To build the ROM, the Makefile assumes `intybasic` and `as1600` are in
+your `PATH`.  It also requires that the variable `INTY_LIB_PATH`
+points to the directory where `intybasic_prologue.asm` and
+`intybasic_epilogue.asm` can be found.  You can set this as an
+environment variable, or as a variable on the `make` command line,
+such as `make editor.rom INTY_LIB_PATH=/some/directory/somewhere`.
+
+You can also type `make run` to build the ROM and run it in the jzIntv
+emulator.  This assumes you have `jzintv` on your `PATH`, and the
+environment variable `JZINTV_ROM_PATH` points to a directory where
+`exec.bin` and `grom.bin` can be found.  (The freely avaiable
+`miniexec.bin` and `minigrom.bin` work fine, if you rename them to
+`exec.bin` and `grom.bin`.)
+
 ## License
 
 The bitmap editor is licensed under the
